@@ -5,7 +5,12 @@
 #include "queue.h"
 
 struct queue {
-	/* TODO Phase 1 */
+	struct queue* head;
+	struct queue* tail;
+
+	int value;
+	struct queue* next;
+
 };
 
 queue_t queue_create(void)
