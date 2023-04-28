@@ -34,23 +34,29 @@ int queue_destroy(queue_t queue)
 
 int queue_enqueue(queue_t queue, void *data)
 {
-	if(queue==NULL||data == NULL)
+	if(queue == NULL||data == NULL)
 		return -1;
 	struct queue* node = malloc(sizeof(struct queue));
 	if(node == NULL)
 		return -1;
 	node->info = data;
-	node->next = queue->head;
-	queue->head = node;
+	node->next = NULL;
+	queue->tail->next = node;
+	queue->tail = node;
 	if(queue->length==0)
-		queue->tail = node;
+		queue->head = node;
 	queue->length++;
 	return 0;
 }
 
 int queue_dequeue(queue_t queue, void **data)
 {
-	/* TODO Phase 1 */
+	if(queue == NULL||data == NULL||queue->length==0)
+		return -1;
+	data = queue->head;
+	queue->head = queue->head->next;
+	queue->length--;
+	return 0;
 }
 
 int queue_delete(queue_t queue, void *data)
