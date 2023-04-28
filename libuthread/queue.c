@@ -17,7 +17,7 @@ queue_t queue_create(void)
 {
 	struct queue* start = malloc(sizeof(struct queue)); 
 	if(start==NULL){
-		fprintf(stderr,"Error allocating memory for queue\n");
+		printf("Error allocating memory for queue\n");
 	}
 	else start->length = 0;
 	return start;
