@@ -10,7 +10,7 @@ struct queue {
 
 	int value;
 	struct queue* next;
-
+	int length;
 };
 
 queue_t queue_create(void)
