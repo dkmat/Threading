@@ -17,7 +17,7 @@ queue_t queue_create(void)
 {
 	struct queue* start = malloc(sizeof(struct queue)); 
 	if(start==NULL){
-		printf("Error allocating memory for queue\n");
+		fprintf(stderr,"Error allocating memory for queue\n");
 	}
 	else start->length = 0;
 	return start;
@@ -58,9 +58,12 @@ int queue_enqueue(queue_t queue, void *data)
 
 int queue_dequeue(queue_t queue, void **data)
 {
-	if(queue == NULL||queue->head->info == NULL||queue->length==0)
+	if(queue == NULL||queue->length==0)
 		return -1;
-	data = queue->head->info;
+	fprintf(stderr, "%p \n", queue->head->info);
+	*data = queue->head->info;
+	if(data==NULL)
+		return -1;
 	queue->head = queue->head->next;
 	queue->length--;
 	return 0;
@@ -117,6 +120,6 @@ int queue_length(queue_t queue)
 	return queue->length;
 }
 
-int get_info(queue_t queue) {
-	return *((int*)queue->head->info);
-}
+/*int get_info(queue_t queue) {
+	return (int)queue->head->info;
+}*/

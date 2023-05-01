@@ -33,16 +33,46 @@ void test_queue_simple(void)
 
 	q = queue_create();
 	queue_enqueue(q, &data);
-	int test = get_info(q);
-	fprintf(stderr,"%d\n", test);
+	int len = queue_length(q);
+	fprintf(stderr,"%d\n", len);
 	queue_dequeue(q, (void**)&ptr);
+	len = queue_length(q);
+	fprintf(stderr,"%p %p \n%d\n",ptr,&data,len);
 	TEST_ASSERT(ptr == &data);
+	queue_enqueue(q,&data);
+	len = queue_length(q);
+	fprintf(stderr,"%d\n", len);
+	queue_dequeue(q, (void**)&ptr);
+	len = queue_length(q);
+	fprintf(stderr,"%p %p \n%d\n",ptr,&data,len);
+	TEST_ASSERT(ptr == &data);
+}
+/* Enqueues twice, dequeues once */
+void test_queue_queue(void){
+	int data1 = 100, data2 = 4, *ptr;
+	queue_t q;
+	fprintf(stderr, "*** TEST queue_queue ***\n");
+
+	q = queue_create();
+	queue_enqueue(q, &data1);
+	int len = queue_length(q);
+	fprintf(stderr,"%d\n", len);
+	queue_enqueue(q, &data2);
+	len = queue_length(q);
+	fprintf(stderr,"%d\n", len);
+
+	queue_dequeue(q, (void**)&ptr);
+	len = queue_length(q);
+	fprintf(stderr,"%p %p \n%d\n",ptr,&data1,len);
+	TEST_ASSERT(ptr == &data1);
+
 }
 
 int main(void)
 {
 	test_create();
 	test_queue_simple();
+	test_queue_queue();
 
 	return 0;
 }
