@@ -7,7 +7,7 @@ CFLAGS := -Wall -Wextra -Werror
 all: $(lib)
 
 $(lib): queue.o
-	$(STATIC) $@ $^
+	$(STATIC) -o $@ $^
 
 queue.o: queue.c queue.h 
 	$(CC) $(CFLAGS) -o $@ $^

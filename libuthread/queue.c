@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdio.h>
 #include "queue.h"
 
 struct queue {
@@ -106,10 +106,14 @@ int queue_iterate(queue_t queue, queue_func_t func)
 		func(queue,current->info);
 		current = current->next;
 	}
+	return 0;
 }
 
 int queue_length(queue_t queue)
 {
+	if(queue==NULL) {
+		return -1;
+	}
 	return queue->length;
 }
 
