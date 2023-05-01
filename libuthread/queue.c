@@ -116,4 +116,3 @@ int queue_length(queue_t queue)
 	}
 	return queue->length;
 }
-

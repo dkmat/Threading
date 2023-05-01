@@ -4,17 +4,13 @@ lib := libuthread.a
 STATIC := ar rcs
 CC := gcc
 CFLAGS := -Wall -Wextra -Werror
-all: $(lib)
+all: $(objects) $(lib) 
 
 $(lib): queue.o
-	$(STATIC) -o $@ $^
+	$(STATIC) $@ $^
 
-queue.o: queue.c queue.h 
-	$(CC) $(CFLAGS) -o $@ $^
-
+queue.o: queue.c  
+	$(CC) $(CFLAGS) -c queue.c -o queue.o
 clean:
 	rm -f $(lib) $(objects)
-
-
-
 
