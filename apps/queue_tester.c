@@ -33,6 +33,8 @@ void test_queue_simple(void)
 
 	q = queue_create();
 	queue_enqueue(q, &data);
+	int test = get_info(q);
+	fprintf(stderr,"%d\n", test);
 	queue_dequeue(q, (void**)&ptr);
 	TEST_ASSERT(ptr == &data);
 }

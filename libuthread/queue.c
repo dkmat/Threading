@@ -58,7 +58,7 @@ int queue_enqueue(queue_t queue, void *data)
 
 int queue_dequeue(queue_t queue, void **data)
 {
-	if(queue == NULL||data == NULL||queue->length==0)
+	if(queue == NULL||queue->head->info == NULL||queue->length==0)
 		return -1;
 	data = queue->head->info;
 	queue->head = queue->head->next;
@@ -115,4 +115,8 @@ int queue_length(queue_t queue)
 		return -1;
 	}
 	return queue->length;
+}
+
+int get_info(queue_t queue) {
+	return *((int*)queue->head->info);
 }
