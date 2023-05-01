@@ -120,6 +120,3 @@ int queue_length(queue_t queue)
 	return queue->length;
 }
 
-/*int get_info(queue_t queue) {
-	return (int)queue->head->info;
-}*/

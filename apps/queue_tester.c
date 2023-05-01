@@ -68,11 +68,29 @@ void test_queue_queue(void){
 
 }
 
+/* creates a queue with values, deletes a value */
+void test_delete(void){
+	int *ptr;
+	int arr[] = {4,5,6,5,4};
+	queue_t q = queue_create();
+	for (int i = 0; i < 5; i++) {
+		queue_enqueue(q, arr[i]);
+	}
+
+	queue_delete(q, arr[1]); // looks for and deletes '5'
+	int len = queue_length(q);
+	fprintf(stderr,"%d\n",len);
+
+	queue_dequeue(q, (void**)&ptr);
+	queue_dequeue(q, (void**)&ptr);
+	TEST_ASSERT(ptr == &arr[2]);
+	
+}
 int main(void)
 {
 	test_create();
 	test_queue_simple();
 	test_queue_queue();
-
+	test_delete();
 	return 0;
 }
