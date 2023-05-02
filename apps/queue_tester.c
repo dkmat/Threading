@@ -34,17 +34,17 @@ void test_queue_simple(void)
 	q = queue_create();
 	queue_enqueue(q, &data);
 	int len = queue_length(q);
-	fprintf(stderr,"%d\n", len);
+	fprintf(stderr,"queue length: %d\n", len);
 	queue_dequeue(q, (void**)&ptr);
 	len = queue_length(q);
-	fprintf(stderr,"%p %p \n%d\n",ptr,&data,len);
+	fprintf(stderr,"queue length: %d\n", len);
 	TEST_ASSERT(ptr == &data);
 	queue_enqueue(q,&data);
 	len = queue_length(q);
-	fprintf(stderr,"%d\n", len);
+	fprintf(stderr,"queue length: %d\n", len);
 	queue_dequeue(q, (void**)&ptr);
 	len = queue_length(q);
-	fprintf(stderr,"%p %p \n%d\n",ptr,&data,len);
+	fprintf(stderr,"queue length: %d\n",len);
 	TEST_ASSERT(ptr == &data);
 }
 /* Enqueues twice, dequeues once */
@@ -56,14 +56,14 @@ void test_queue_queue(void){
 	q = queue_create();
 	queue_enqueue(q, &data1);
 	int len = queue_length(q);
-	fprintf(stderr,"%d\n", len);
+	fprintf(stderr,"queue length: %d\n", len);
 	queue_enqueue(q, &data2);
 	len = queue_length(q);
-	fprintf(stderr,"%d\n", len);
+	fprintf(stderr,"queue length: %d\n", len);
 
 	queue_dequeue(q, (void**)&ptr);
 	len = queue_length(q);
-	fprintf(stderr,"%p %p \n%d\n",ptr,&data1,len);
+	fprintf(stderr,"queue length: %d\n", len);
 	TEST_ASSERT(ptr == &data1);
 
 }
@@ -72,18 +72,23 @@ void test_queue_queue(void){
 void test_delete(void){
 	int *ptr;
 	int arr[] = {4,5,6,5,4};
+	fprintf(stderr, "*** TEST delete***\n");
 	queue_t q = queue_create();
 	for (int i = 0; i < 5; i++) {
-		queue_enqueue(q, arr[i]);
+		queue_enqueue(q, &arr[i]);
 	}
 
-	queue_delete(q, arr[1]); // looks for and deletes '5'
+	queue_delete(q, &arr[1]); // looks for and deletes '5'
 	int len = queue_length(q);
-	fprintf(stderr,"%d\n",len);
+	fprintf(stderr,"queue length: %d\n",len);
 
 	queue_dequeue(q, (void**)&ptr);
 	queue_dequeue(q, (void**)&ptr);
 	TEST_ASSERT(ptr == &arr[2]);
+
+	queue_dequeue(q, (void**)&ptr);
+	queue_dequeue(q, (void**)&ptr);
+	TEST_ASSERT(ptr == &arr[4]);
 	
 }
 int main(void)

@@ -60,7 +60,7 @@ int queue_dequeue(queue_t queue, void **data)
 {
 	if(queue == NULL||queue->length==0)
 		return -1;
-	fprintf(stderr, "%p \n", queue->head->info);
+	// fprintf(stderr, "%p \n", queue->head->info);
 	*data = queue->head->info;
 	if(data==NULL)
 		return -1;
