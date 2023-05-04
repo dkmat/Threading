@@ -91,11 +91,26 @@ void test_delete(void){
 	TEST_ASSERT(ptr == &arr[4]);
 	
 }
+
+void test_destroy(void){
+	fprintf(stderr, "*** TEST destroy***\n");
+	queue_t q = queue_create();
+	int data = 10, *ptr,retval;
+	queue_enqueue(q,&data);
+	retval = queue_destroy(q);
+	TEST_ASSERT(retval == -1);
+	queue_dequeue(q,(void**)&ptr);
+	retval = queue_destroy(q);
+	TEST_ASSERT(retval == 0);
+	retval = queue_enqueue(q,&data);
+	TEST_ASSERT(retval == -1);
+}
 int main(void)
 {
 	test_create();
 	test_queue_simple();
 	test_queue_queue();
 	test_delete();
+	test_destroy();
 	return 0;
 }

@@ -18,21 +18,19 @@ queue_t queue_create(void)
 	struct queue* start = malloc(sizeof(struct queue)); 
 	if(start==NULL){
 		fprintf(stderr,"Error allocating memory for queue\n");
+		return NULL;
 	}
-	else start->length = 0;
+	start->length = 0;
 	return start;
 }
 
 int queue_destroy(queue_t queue)
 {
-	if(queue==NULL)
+	if(queue==NULL||queue->length!=0)
 		return -1;
-	else if(queue->length!=0)
-		return -1;
-	else {
-		free(queue);
-		return 0;
-	}
+	free(queue);
+	queue = NULL;
+	return 0;
 
 }
 
@@ -73,7 +71,7 @@ int queue_delete(queue_t queue, void *data)
 {
 	if(queue==NULL || data==NULL)
 		return -1;
-	struct queue *previous, *current;
+	struct queue *previous, *current; // do we have to dynamically allocate here?
 	// if head node matches data to be deleted
 	if(queue->head->info==data) {
 		current = queue->head;
