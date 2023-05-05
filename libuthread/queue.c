@@ -33,7 +33,6 @@ int queue_destroy(queue_t queue)
 		return -1;
 	free(queue);
 	return 0;
-
 }
 
 int queue_enqueue(queue_t queue, void *data)
@@ -109,7 +108,6 @@ int queue_iterate(queue_t queue, queue_func_t func)
 	struct node *current = queue->head; // initialize to head node
 	struct node *keep;
 	while(current!=NULL){
-		//fprintf(stderr,"here\n");
 		keep = current->next; // to preserve pointer in case we delete
 		func(queue,current->info);
 		current = keep;
