@@ -75,9 +75,9 @@ int queue_dequeue(queue_t queue, void **data)
 	*data = queue->head->info;
 	if(data==NULL)
 		return -1;
-	struct node* deal = queue->head;
+	struct node* deall = queue->head;
 	queue->head = queue->head->next;
-	free(deal);
+	free(deall);
 	queue->length--;
 	return 0;
 }
