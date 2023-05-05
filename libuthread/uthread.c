@@ -57,6 +57,9 @@ int uthread_create(uthread_func_t func, void *arg)
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	struct uthread_tcb *idle = malloc(sizeof(struct uthread_tcb));
+	idle->context = malloc(sizeof(uthread_ctx_t));
+	idle->threadStack = uthread_ctx_alloc_stack();
+	idle->state = RUNNING;
 	if(!preempt)
 		uthread_create(func,arg);
 	return 0;
