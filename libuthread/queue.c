@@ -5,17 +5,19 @@
 #include "queue.h"
 
 struct queue {
-	struct queue* head;
-	struct queue* tail;
+	struct node* head;
+	struct node* tail;
 	int length;
+};
 
+struct node{
 	void* info;
-	struct queue* next;
+	struct node* next;
 };
 
 queue_t queue_create(void)
 {
-	struct queue* start = malloc(sizeof(struct queue)); 
+	queue_t start = malloc(sizeof(queue_t)); 
 	if(start==NULL){
 		fprintf(stderr,"Error allocating memory for queue\n");
 		return NULL;
@@ -28,8 +30,20 @@ int queue_destroy(queue_t queue)
 {
 	if(queue==NULL||queue->length!=0)
 		return -1;
+	struct node *destroy = queue->head;
+	while(destroy != NULL){
+		struct node *next = destroy->next;
+		free(destroy);
+		destroy = next;
+	}
+	free(queue->tail);
 	free(queue);
 	queue = NULL;
+	if(queue==NULL) {
+		fprintf(stderr, "queue NULL\n");
+	} else {
+		fprintf(stderr, "queue NOT NULL\n");
+	}
 	return 0;
 
 }
@@ -38,18 +52,18 @@ int queue_enqueue(queue_t queue, void *data)
 {
 	if(queue == NULL||data == NULL)
 		return -1;
-	struct queue* node = malloc(sizeof(struct queue));
-	if(node == NULL)
+	struct node* item = malloc(sizeof(struct node));
+	if(item == NULL)
 		return -1;
-	node->info = data;
-	node->next = NULL;
+	item->info = data;
+	item->next = NULL;
 	if(queue->length==0) // empty queue
-		queue->head = node;
+		queue->head = item;
 	else{
-		queue->tail->next = node;
+		queue->tail->next = item;
+
 	}
-	
-	queue->tail = node;
+	queue->tail = item;
 	queue->length++;
 	return 0;
 }
@@ -58,11 +72,12 @@ int queue_dequeue(queue_t queue, void **data)
 {
 	if(queue == NULL||queue->length==0)
 		return -1;
-	// fprintf(stderr, "%p \n", queue->head->info);
 	*data = queue->head->info;
 	if(data==NULL)
 		return -1;
+	struct node* deal = queue->head;
 	queue->head = queue->head->next;
+	free(deal);
 	queue->length--;
 	return 0;
 }
@@ -71,7 +86,7 @@ int queue_delete(queue_t queue, void *data)
 {
 	if(queue==NULL || data==NULL)
 		return -1;
-	struct queue *previous, *current; // do we have to dynamically allocate here?
+	struct node *previous, *current; 
 	// if head node matches data to be deleted
 	if(queue->head->info==data) {
 		current = queue->head;
@@ -90,7 +105,11 @@ int queue_delete(queue_t queue, void *data)
 	if(current!=NULL) {
 		// match found
 		previous->next = current->next;
+		int next_info = *(int*)previous->next->info;
+		int curr_next_info = *(int*)current->next->info;
+		fprintf(stderr, "inside delete(). curr->next->info = %d, previous->next->info = %d\n", curr_next_info, next_info);
 		free(current);
+		fprintf(stderr,"free correct\n");
 		queue->length--;
 		return 0;
 	}
@@ -101,12 +120,17 @@ int queue_iterate(queue_t queue, queue_func_t func)
 {
 	if(queue==NULL || func==NULL)
 		return -1;
-	struct queue *current;
+	struct node *current;
 	current = queue->head; // initialize to head node
 	while(current!=NULL){
+		fprintf(stderr,"here\n");
+		int curr_info = *(int*)current->info;
+		fprintf(stderr, "inside while loop. current->info = %d\n", curr_info);
 		func(queue,current->info);
+		fprintf(stderr,"finished func()\n");
 		current = current->next;
 	}
+	fprintf(stderr, "outside while loop\n");
 	return 0;
 }
 
