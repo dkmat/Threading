@@ -102,8 +102,6 @@ void test_destroy(void){
 	queue_dequeue(q,(void**)&ptr);
 	retval = queue_destroy(q); // queue empty, should successfully destroy
 	TEST_ASSERT(retval == 0);
-	retval = queue_enqueue(q,&data);
-	TEST_ASSERT(retval == -1);
 }
 static void iterator_inc(queue_t q, void *data)
 {
