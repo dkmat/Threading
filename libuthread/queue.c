@@ -30,20 +30,7 @@ int queue_destroy(queue_t queue)
 {
 	if(queue==NULL||queue->length!=0)
 		return -1;
-	struct node *destroy = queue->head;
-	while(destroy != NULL){
-		struct node *next = destroy->next;
-		free(destroy);
-		destroy = next;
-	}
-	free(queue->tail);
 	free(queue);
-	queue = NULL;
-	if(queue==NULL) {
-		fprintf(stderr, "queue NULL\n");
-	} else {
-		fprintf(stderr, "queue NOT NULL\n");
-	}
 	return 0;
 
 }
@@ -98,18 +85,24 @@ int queue_delete(queue_t queue, void *data)
 	// move to node after head
 	previous = queue->head;
 	current = previous->next;
-	while(current!=NULL && current->info != data){ // while no match found
+	while(current!=queue->tail){ // while no match found
+		if(current->info==data) {
+		// match found
+		previous->next = current->next;
+		int curr_info = *(int*)current->info;
+		//int curr_next_info = *(int*)current->next->info;
+		fprintf(stderr, "current value: %d\n", curr_info);
+		free(current);
+		//fprintf(stderr,"free correct\n");
+		queue->length--;
+		return 0;
+	}
 		previous = current;
 		current = current->next;
 	}
-	if(current!=NULL) {
-		// match found
-		previous->next = current->next;
-		int next_info = *(int*)previous->next->info;
-		int curr_next_info = *(int*)current->next->info;
-		fprintf(stderr, "inside delete(). curr->next->info = %d, previous->next->info = %d\n", curr_next_info, next_info);
+	if(current==queue->tail && current->info ==data){
+		queue->tail = previous;
 		free(current);
-		fprintf(stderr,"free correct\n");
 		queue->length--;
 		return 0;
 	}
@@ -120,17 +113,16 @@ int queue_iterate(queue_t queue, queue_func_t func)
 {
 	if(queue==NULL || func==NULL)
 		return -1;
-	struct node *current;
-	current = queue->head; // initialize to head node
-	while(current!=NULL){
+	struct node *current = queue->head; // initialize to head node
+	while(current!=queue->tail){
 		fprintf(stderr,"here\n");
-		int curr_info = *(int*)current->info;
-		fprintf(stderr, "inside while loop. current->info = %d\n", curr_info);
 		func(queue,current->info);
 		fprintf(stderr,"finished func()\n");
 		current = current->next;
+		int curr_info = *(int*)current->info;
+		fprintf(stderr, "current->info = %d\n", curr_info);
 	}
-	fprintf(stderr, "outside while loop\n");
+	func(queue,queue->tail->info);
 	return 0;
 }
 

@@ -102,12 +102,6 @@ void test_destroy(void){
 	queue_dequeue(q,(void**)&ptr);
 	retval = queue_destroy(q); // queue empty, should successfully destroy
 	TEST_ASSERT(retval == 0);
-	if(q==NULL) {
-		fprintf(stderr, "q NULL\n");
-	} else {
-		fprintf(stderr, "q NOT NULL\n");
-	}
-
 	retval = queue_enqueue(q,&data);
 	TEST_ASSERT(retval == -1);
 }
@@ -145,7 +139,7 @@ int main(void)
 	test_queue_simple();
 	test_queue_queue();
 	test_delete();
-	//test_destroy();
+	test_destroy();
 	test_iterator();
 	return 0;
 }
