@@ -89,14 +89,13 @@ int queue_delete(queue_t queue, void *data)
 	while(current!=NULL){ // while no match found
 		if(current->info==data) {
 		// match found
-		previous->next = current->next;
-		int curr_info = *(int*)current->info;
-		fprintf(stderr, "current value: %d\n", curr_info);
-		free(current);
-		current = NULL;
-		queue->length--;
-		return 0;
-	}
+			previous->next = current->next;
+			//int curr_info = *(int*)current->info;
+			//fprintf(stderr, "current value: %d\n", curr_info);
+			free(current);
+			queue->length--;
+			return 0;
+		}
 		previous = current;
 		current = current->next;
 	}
@@ -108,13 +107,12 @@ int queue_iterate(queue_t queue, queue_func_t func)
 	if(queue==NULL || func==NULL)
 		return -1;
 	struct node *current = queue->head; // initialize to head node
+	struct node *keep;
 	while(current!=NULL){
-		fprintf(stderr,"here\n");
+		//fprintf(stderr,"here\n");
+		keep = current->next; // to preserve pointer in case we delete
 		func(queue,current->info);
-		fprintf(stderr,"finished func()\n");
-		//int curr_info = *(int*)current->info;
-		//fprintf(stderr, "current->info = %d\n", curr_info);
-		current = current->next;
+		current = keep;
 	}
 	return 0;
 }
