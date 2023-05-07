@@ -27,8 +27,7 @@ struct uthread_tcb* current;
 
 struct uthread_tcb *uthread_current(void)
 {
-	/* TODO Phase 2/3 */
-	return NULL;
+	return current;
 }
 
 void uthread_yield(void)
