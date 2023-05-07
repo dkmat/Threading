@@ -31,20 +31,12 @@ struct uthread_tcb *uthread_current(void)
 
 void uthread_yield(void)
 {
-	struct uthread_tcb *current = uthread_current();
-	struct uthread_tcb* next;
-	queue_dequeue(ready_queue,(void**)&next);
-	uthread_ctx_switch(current->context,next->context);
-	queue_enqueue(ready_queue,current);
-	uthread_exit();
+	
 }
 
 void uthread_exit(void)
 {
-	struct uthread_tcb * current = uthread_current();
-	struct uthread_tcb * next;
-	queue_dequeue(ready_queue,(void**)&next);
-	uthread_ctx_switch(current->context,next->context);
+	
 }
 
 int uthread_create(uthread_func_t func, void *arg)
@@ -55,10 +47,12 @@ int uthread_create(uthread_func_t func, void *arg)
 	thread->threadStack = uthread_ctx_alloc_stack(); // allocate stack
 	if(thread->threadStack==NULL)
 		return -1;
+	thread->context = malloc(sizeof(ucontext_t));
 	int retval = uthread_ctx_init(thread->context, thread->threadStack, func, arg); // initialize context
-	if(retval==-1)
+	if(retval==-1) 
 		return -1;
-	queue_enqueue(ready_queue,thread);
+
+	queue_enqueue(ready_queue,thread->context);
 	return 0;
 }
 
@@ -68,11 +62,15 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	struct uthread_tcb *idle = malloc(sizeof(struct uthread_tcb));
 	idle->context = malloc(sizeof(uthread_ctx_t));
 	idle->threadStack = uthread_ctx_alloc_stack();
+
 	if(!preempt){
 		uthread_create(func,arg);
-		uthread_yield();
+		uthread_ctx_t* next;
+		queue_dequeue(ready_queue,(void**)&next); // dequeue next ready process
+		queue_enqueue(ready_queue,idle->context);// enqueue idle process
+		uthread_ctx_switch(idle->context,next); // context switch from current(idle) -> next
+
 	}
-		
 	return 0;
 }
 
