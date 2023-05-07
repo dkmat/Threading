@@ -22,6 +22,7 @@ struct uthread_tcb {
 	void* threadStack;
 	uthread_ctx_t* context;
 };
+struct uthread_tcb* current;
 
 struct uthread_tcb *uthread_current(void)
 {
@@ -31,21 +32,23 @@ struct uthread_tcb *uthread_current(void)
 
 void uthread_yield(void)
 {
-	uthread_ctx_t* next;
-	uthread_ctx_t* current = malloc(sizeof(uthread_ctx_t));
-	getcontext(current); // get context of current thread
+	struct uthread_tcb* next;
+	struct uthread_tcb* swap = current;
 	queue_dequeue(ready_queue,(void**)&next); // dequeue next ready process
 	queue_enqueue(ready_queue,current);// enqueue current process
-	uthread_ctx_switch(current,next); // context switch from current -> next
+	current = next;
+	uthread_ctx_switch(swap->context,next->context); // context switch from current -> next
 }
 
 void uthread_exit(void)
 {
-	uthread_ctx_t* next;
-	uthread_ctx_t* current = malloc(sizeof(uthread_ctx_t));
-	getcontext(current); // get context of current thread
+	struct uthread_tcb* next;
+	struct uthread_tcb* swap = current;
+	// uthread_ctx_t* current = malloc(sizeof(uthread_ctx_t));
+	// getcontext(current); // get context of current thread
 	queue_dequeue(ready_queue,(void**)&next); // dequeue next ready process ()
-	uthread_ctx_switch(current,next);// context switch from current -> next
+	current = next;
+	uthread_ctx_switch(swap->context,next->context);// context switch from current -> next
 }
 
 int uthread_create(uthread_func_t func, void *arg)
@@ -61,20 +64,23 @@ int uthread_create(uthread_func_t func, void *arg)
 	if(retval==-1) 
 		return -1;
 
-	queue_enqueue(ready_queue,thread->context);
+	queue_enqueue(ready_queue,thread);
 	return 0;
 }
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	ready_queue = queue_create();
-	//struct uthread_tcb *idle = malloc(sizeof(struct uthread_tcb));
-	//idle->context = malloc(sizeof(uthread_ctx_t));
-	//idle->threadStack = uthread_ctx_alloc_stack();
+	struct uthread_tcb *idle = malloc(sizeof(struct uthread_tcb));
+	idle->context = malloc(sizeof(uthread_ctx_t));
+	idle->threadStack = uthread_ctx_alloc_stack();
 	if(!preempt){
 		uthread_create(func,arg);
-		while(queue_length(ready_queue)!=0) // while other threads are ready and waiting
+		while(queue_length(ready_queue)!=0){// while other threads are ready and waiting
+			current = idle;
 			uthread_yield();
+			
+		} 
 		fprintf(stderr,"back in main\n");
 	}
 	return 0;
