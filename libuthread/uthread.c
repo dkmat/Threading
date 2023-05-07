@@ -16,6 +16,7 @@
 #define BLOCKED 3
 #define UNUSED(x) (void)(x)
 
+queue_t ready_queue;
 
 struct uthread_tcb {
 	void* threadStack;
@@ -31,12 +32,24 @@ struct uthread_tcb *uthread_current(void)
 
 void uthread_yield(void)
 {
-	/* TODO Phase 2 */
+	uthread_ctx_t * current;
+	getcontext(current);
+	uthread_ctx_t * next;
+	queue_dequeue(ready_queue,(void**)&next);
+	uthread_ctx_switch(current,next);
+	queue_enqueue(ready_queue,current);
+	if(queue_length(ready_queue)==1)
+		uthread_exit();
 }
 
 void uthread_exit(void)
 {
-	
+	uthread_ctx_t * current;
+	getcontext(current);
+	uthread_ctx_t * last;
+	queue_dequeue(ready_queue,(void**)&last);
+	uthread_ctx_switch(current,last);
+	free(ready_queue);
 }
 
 int uthread_create(uthread_func_t func, void *arg)
@@ -50,18 +63,21 @@ int uthread_create(uthread_func_t func, void *arg)
 	int retval = uthread_ctx_init(thread->context, thread->threadStack, func, arg); // initialize context
 	if(retval==-1)
 		return -1;
+	queue_enqueue(ready_queue,thread->context);
 	thread->state = READY; //update state
 	return 0;
 }
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
+	ready_queue = queue_create();
 	struct uthread_tcb *idle = malloc(sizeof(struct uthread_tcb));
 	idle->context = malloc(sizeof(uthread_ctx_t));
 	idle->threadStack = uthread_ctx_alloc_stack();
 	idle->state = RUNNING;
 	if(!preempt)
 		uthread_create(func,arg);
+		uthread_yield();
 	return 0;
 }
 
