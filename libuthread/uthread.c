@@ -32,7 +32,7 @@ struct uthread_tcb *uthread_current(void)
 
 void uthread_yield(void)
 {
-	uthread_ctx_t * current;
+	uthread_ctx_t * current = malloc(sizeof(uthread_ctx_t));
 	getcontext(current);
 	uthread_ctx_t * next;
 	queue_dequeue(ready_queue,(void**)&next);
@@ -44,7 +44,7 @@ void uthread_yield(void)
 
 void uthread_exit(void)
 {
-	uthread_ctx_t * current;
+	uthread_ctx_t * current = malloc(sizeof(uthread_ctx_t));
 	getcontext(current);
 	uthread_ctx_t * last;
 	queue_dequeue(ready_queue,(void**)&last);
@@ -75,9 +75,11 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	idle->context = malloc(sizeof(uthread_ctx_t));
 	idle->threadStack = uthread_ctx_alloc_stack();
 	idle->state = RUNNING;
-	if(!preempt)
+	if(!preempt){
 		uthread_create(func,arg);
 		uthread_yield();
+	}
+		
 	return 0;
 }
 
