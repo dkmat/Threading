@@ -76,11 +76,6 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 		while(queue_length(ready_queue)!=0){// while other threads are ready and waiting
 			current = idle;
 			uthread_yield();
-			//if(current->status == EXIT) {
-			//	uthread_ctx_destroy_stack(current->threadStack);
-				//free(current->context);
-				//free(current);
-			//}
 		} 
 		free(current);
 		fprintf(stderr,"back in main\n");
