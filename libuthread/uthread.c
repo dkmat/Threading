@@ -21,6 +21,7 @@ queue_t ready_queue;
 struct uthread_tcb {
 	void* threadStack;
 	uthread_ctx_t* context;
+	int status;
 };
 struct uthread_tcb* current;
 
@@ -43,12 +44,9 @@ void uthread_yield(void)
 void uthread_exit(void)
 {
 	struct uthread_tcb* next;
-	struct uthread_tcb* swap = current;
-	// uthread_ctx_t* current = malloc(sizeof(uthread_ctx_t));
-	// getcontext(current); // get context of current thread
 	queue_dequeue(ready_queue,(void**)&next); // dequeue next ready process ()
-	current = next;
-	uthread_ctx_switch(swap->context,next->context);// context switch from current -> next
+	current->status= EXIT;
+	uthread_ctx_switch(current->context,next->context);// context switch from current -> next
 }
 
 int uthread_create(uthread_func_t func, void *arg)
@@ -63,7 +61,7 @@ int uthread_create(uthread_func_t func, void *arg)
 	int retval = uthread_ctx_init(thread->context, thread->threadStack, func, arg); // initialize context
 	if(retval==-1) 
 		return -1;
-
+	thread->status = READY;
 	queue_enqueue(ready_queue,thread);
 	return 0;
 }
@@ -79,8 +77,13 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 		while(queue_length(ready_queue)!=0){// while other threads are ready and waiting
 			current = idle;
 			uthread_yield();
-			
+			//if(current->status == EXIT) {
+			//	uthread_ctx_destroy_stack(current->threadStack);
+				//free(current->context);
+				//free(current);
+			//}
 		} 
+		free(current);
 		fprintf(stderr,"back in main\n");
 	}
 	return 0;
