@@ -68,9 +68,9 @@ int uthread_create(uthread_func_t func, void *arg)
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	ready_queue = queue_create();
-	struct uthread_tcb *idle = malloc(sizeof(struct uthread_tcb));
-	idle->context = malloc(sizeof(uthread_ctx_t));
-	idle->threadStack = uthread_ctx_alloc_stack();
+	//struct uthread_tcb *idle = malloc(sizeof(struct uthread_tcb));
+	//idle->context = malloc(sizeof(uthread_ctx_t));
+	//idle->threadStack = uthread_ctx_alloc_stack();
 	if(!preempt){
 		uthread_create(func,arg);
 		while(queue_length(ready_queue)!=0) // while other threads are ready and waiting
