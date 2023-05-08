@@ -6,12 +6,16 @@
 #include "private.h"
 
 struct semaphore {
-	/* TODO Phase 3 */
+	int count;
+	queue_t wait_queue;
 };
 
 sem_t sem_create(size_t count)
 {
-	/* TODO Phase 3 */
+	sem_t create = malloc(sizeof(sem_t));
+	create->count = count;
+	create->wait_queue = malloc(sizeof(queue_t));
+	create->wait_queue = queue_create();
 }
 
 int sem_destroy(sem_t sem)

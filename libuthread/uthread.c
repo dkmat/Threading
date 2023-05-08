@@ -38,6 +38,7 @@ void uthread_yield(void)
 	queue_enqueue(ready_queue,current);// enqueue current process
 	current = next;
 	uthread_ctx_switch(swap->context,next->context); // context switch from current -> next
+	
 }
 
 void uthread_exit(void)
@@ -76,8 +77,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 		while(queue_length(ready_queue)!=0){// while other threads are ready and waiting
 			current = idle;
 			uthread_yield();
-		} 
-		free(current);
+		}
 		fprintf(stderr,"back in main\n");
 	}
 	return 0;
