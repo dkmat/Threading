@@ -31,11 +31,27 @@ int sem_destroy(sem_t sem)
 
 int sem_down(sem_t sem)
 {
-	/* TODO Phase 3 */
+	if(sem==NULL)
+		return -1;
+	if(sem->count>0)
+		sem->count--;
+	else{
+		uthread_block();
+		queue_enqueue(sem->wait_queue,uthread_current());
+	}
+	return 0;
 }
 
 int sem_up(sem_t sem)
 {
-	/* TODO Phase 3 */
+	if(sem==NULL)
+		return -1;
+	sem->count++;
+	if(queue_length(sem->wait_queue)>0){
+		struct uthread_tcb * ready;
+		queue_dequeue(sem->wait_queue,(void**)&ready);
+		uthread_unblock(ready);
+	}
+	return 0;
 }
 

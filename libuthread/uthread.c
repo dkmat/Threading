@@ -85,12 +85,16 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 
 void uthread_block(void)
 {
-	/* TODO Phase 3 */
+	struct uthread_tcb* next;
+	struct uthread_tcb* swap = current;
+	queue_dequeue(ready_queue,(void**)&next);
+	current = next;
+	uthread_ctx_switch(swap->context,next->context);
 }
 
 void uthread_unblock(struct uthread_tcb *uthread)
 {
-	/* TODO Phase 3 */
-	UNUSED(uthread);
+	queue_enqueue(ready_queue,uthread);
+	uthread_yield();
 }
 
