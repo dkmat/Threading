@@ -36,7 +36,8 @@ int sem_down(sem_t sem)
 	if(sem->count>0)
 		sem->count--;
 	else{
-		queue_enqueue(sem->wait_queue,uthread_current());
+		struct uthread_tcb * curr = uthread_current();
+		queue_enqueue(sem->wait_queue,curr);
 		uthread_block();
 	}
 	return 0;
@@ -51,6 +52,7 @@ int sem_up(sem_t sem)
 		struct uthread_tcb * ready;
 		queue_dequeue(sem->wait_queue,(void**)&ready);
 		uthread_unblock(ready);
+		sem->count--;
 	}
 	return 0;
 }
