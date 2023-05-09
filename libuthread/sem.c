@@ -36,8 +36,8 @@ int sem_down(sem_t sem)
 	if(sem->count>0)
 		sem->count--;
 	else{
-		uthread_block();
 		queue_enqueue(sem->wait_queue,uthread_current());
+		uthread_block();
 	}
 	return 0;
 }
