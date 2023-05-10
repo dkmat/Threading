@@ -15,21 +15,21 @@ do {									\
 	}									\
 } while(0)
 
-/* Create */
+/* Test Create */
 void test_create(void)
 {
-	fprintf(stderr, "*** TEST create ***\n");
+	fprintf(stderr, "\n*** TEST create ***\n");
 
 	TEST_ASSERT(queue_create() != NULL);
 }
 
-/* Enqueue/Dequeue simple */
+/* Test Enqueue/Dequeue simple: enqueues then dequeues; enqueues then dequeues */
 void test_queue_simple(void)
 {
 	int data = 3, *ptr;
 	queue_t q;
 
-	fprintf(stderr, "*** TEST queue_simple ***\n");
+	fprintf(stderr, "\n*** TEST queue_simple ***\n");
 
 	q = queue_create();
 	queue_enqueue(q, &data);
@@ -47,11 +47,11 @@ void test_queue_simple(void)
 	fprintf(stderr,"queue length: %d\n",len);
 	TEST_ASSERT(ptr == &data);
 }
-/* Enqueues twice, dequeues once */
+/* Test Queue Queue: Enqueues twice, dequeues once */
 void test_queue_queue(void){
 	int data1 = 100, data2 = 4, *ptr;
 	queue_t q;
-	fprintf(stderr, "*** TEST queue_queue ***\n");
+	fprintf(stderr, "\n*** TEST queue_queue ***\n");
 
 	q = queue_create();
 	queue_enqueue(q, &data1);
@@ -68,11 +68,11 @@ void test_queue_queue(void){
 
 }
 
-/* creates a queue with values, deletes a value */
+/* Test Delete: creates a queue and initializes it with values; deletes '5' */
 void test_delete(void){
 	int *ptr;
 	int arr[] = {4,5,6,5,4};
-	fprintf(stderr, "*** TEST delete***\n");
+	fprintf(stderr, "\n*** TEST delete***\n");
 	queue_t q = queue_create();
 	for (int i = 0; i < 5; i++) {
 		queue_enqueue(q, &arr[i]);
@@ -92,8 +92,9 @@ void test_delete(void){
 	
 }
 
+/* Test Destroy: makes sure destroy() is only successful when queue is empty */
 void test_destroy(void){
-	fprintf(stderr, "*** TEST destroy***\n");
+	fprintf(stderr, "\n*** TEST destroy***\n");
 	queue_t q = queue_create();
 	int data = 10, *ptr,retval;
 	queue_enqueue(q,&data);
@@ -103,6 +104,7 @@ void test_destroy(void){
 	retval = queue_destroy(q); // queue empty, should successfully destroy
 	TEST_ASSERT(retval == 0);
 }
+
 static void iterator_inc(queue_t q, void *data)
 {
     int *a = (int*)data;
@@ -113,9 +115,10 @@ static void iterator_inc(queue_t q, void *data)
         *a += 1;
 }
 
+/* Test iterator: initialize the queue with values, then increment every value in the queue and perform a deletion */
 void test_iterator(void)
 {
-	fprintf(stderr, "*** TEST iterator***\n");
+	fprintf(stderr, "\n*** TEST iterator***\n");
     queue_t q;
     int data[] = {1, 2, 3, 4, 5, 42, 6, 7, 8, 9};
     size_t i;
@@ -131,6 +134,72 @@ void test_iterator(void)
     TEST_ASSERT(queue_length(q) == 9);
 }
 
+/* Test Enqueue Null: try to enqueue null data */
+void test_enqueue_nullval(void)
+{
+	fprintf(stderr, "\n*** TEST enqueue null val ***\n");
+	queue_t q = queue_create();
+	int *data = NULL;
+	int retval;
+	retval = queue_enqueue(q, data);
+	TEST_ASSERT(retval == -1);
+}
+
+/* Test Enqueue Null Queue: try to enqueue to a null queue */
+void test_enqueue_nullq(void)
+{
+	fprintf(stderr, "\n*** TEST enqueue null queue ***\n");
+	queue_t q = NULL;
+	int data = 3;
+	int retval;
+	retval = queue_enqueue(q, &data);
+	TEST_ASSERT(retval == -1);
+}
+
+/* Test Dequeue Empty Queue: try to dequeue an empty queue */
+void test_dequeue_empty(void)
+{
+	fprintf(stderr, "\n*** TEST dequeue empty ***\n");
+	queue_t q = queue_create();
+	void **data = NULL;
+	int retval;
+	retval = queue_dequeue(q, data);
+	TEST_ASSERT(retval == -1);
+}
+
+/* Test Delete Null: try to delete null value */
+void test_delete_nullval(void)
+{
+	fprintf(stderr, "\n*** TEST delete null val ***\n");
+	queue_t q = queue_create();
+	int *data = NULL;
+	int retval;
+	retval = queue_delete(q, data);
+	TEST_ASSERT(retval == -1);
+}
+
+/* Test Delete Empty Q: try to delete from an empty queue */
+void test_delete_empty(void)
+{
+	fprintf(stderr, "\n*** TEST delete empty ***\n");
+	queue_t q = queue_create();
+	int three = 3;
+	int *data = &three;
+	int retval;
+	retval = queue_delete(q, data);
+	TEST_ASSERT(retval == -1);
+}
+
+/* Test Destroy Nexist: try to destroy a nonexistent queue */
+void test_destroy_nexist(void)
+{
+	fprintf(stderr, "\n*** TEST destroy nonexistent queue ***\n");
+	queue_t q = NULL;
+	int retval;
+	retval = queue_destroy(q); // queue not created, should return unsuccessful
+	TEST_ASSERT(retval == -1);
+}
+
 int main(void)
 {
 	test_create();
@@ -139,5 +208,11 @@ int main(void)
 	test_delete();
 	test_destroy();
 	test_iterator();
+	test_enqueue_nullval();
+	test_enqueue_nullq();
+	test_dequeue_empty();
+	test_delete_empty();
+	test_destroy_nexist();
+
 	return 0;
 }

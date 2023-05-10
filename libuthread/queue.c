@@ -71,7 +71,7 @@ int queue_dequeue(queue_t queue, void **data)
 
 int queue_delete(queue_t queue, void *data)
 {
-	if(queue==NULL || data==NULL)
+	if(queue==NULL || data==NULL || queue->length==0)
 		return -1;
 	struct node *previous, *current; 
 	// if head node matches data to be deleted
