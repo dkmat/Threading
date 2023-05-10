@@ -19,10 +19,8 @@ struct queue {
 queue_t queue_create(void)
 {
 	queue_t start = malloc(sizeof(queue_t)); 
-	if(start==NULL){
-		fprintf(stderr,"Error allocating memory for queue\n");
+	if(start==NULL)
 		return NULL;
-	}
 	start->length = 0;
 	return start;
 }
@@ -89,8 +87,6 @@ int queue_delete(queue_t queue, void *data)
 		if(current->info==data) {
 		// match found
 			previous->next = current->next;
-			//int curr_info = *(int*)current->info;
-			//fprintf(stderr, "current value: %d\n", curr_info);
 			free(current);
 			queue->length--;
 			return 0;
