@@ -76,6 +76,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 			uthread_yield();
 		}
 		fprintf(stderr,"back in main\n");
+		queue_destroy(ready_queue);
 	}
 	return 0;
 }
