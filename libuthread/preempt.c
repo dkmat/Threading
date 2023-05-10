@@ -24,12 +24,12 @@ void sig_handler(int signum){
 
 void preempt_disable(void)
 {
-	/* TODO Phase 4 */
+	
 }
 
 void preempt_enable(void)
 {
-	/* TODO Phase 4 */
+	
 }
 
 void preempt_start(bool preempt)

@@ -21,7 +21,6 @@ queue_t ready_queue;
 struct uthread_tcb {
 	void* threadStack;
 	uthread_ctx_t* context;
-	int status;
 };
 struct uthread_tcb* current;
 
@@ -45,7 +44,6 @@ void uthread_exit(void)
 {
 	struct uthread_tcb* next;
 	queue_dequeue(ready_queue,(void**)&next); // dequeue next ready process ()
-	current->status= EXIT;
 	uthread_ctx_switch(current->context,next->context);// context switch from current -> next
 }
 
@@ -61,7 +59,6 @@ int uthread_create(uthread_func_t func, void *arg)
 	int retval = uthread_ctx_init(thread->context, thread->threadStack, func, arg); // initialize context
 	if(retval==-1) 
 		return -1;
-	thread->status = READY;
 	queue_enqueue(ready_queue,thread);
 	return 0;
 }
