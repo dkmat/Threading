@@ -46,7 +46,10 @@ This function checks if queue is not NULL. Returns queue length for success and
 -1 for failure.
 
 ### Queue Testing
-To test our implementation, we use several test cases (see queue_tester.c file) to catch corner cases (such as enqueuing/dequeueing from a queue that hasn't been created yet) and ensure correct operation (making sure that deleting a particular value works correctly).
+To test our implementation, we use several test cases (see queue_tester.c file)
+to catch corner cases (such as enqueuing/dequeueing from a queue that hasn't
+been created yet) and ensure correct operation (making sure that deleting a
+particular value works correctly).
 
 ## UThread Implementation
 We use a struct to hold information about each thread's stack and its context.
@@ -80,7 +83,9 @@ keeps running the threads until there are threads in the ready_queue. Once all
 the threads are done executing and exit then this function returns 0 to exit.
 
 ### UThread Testing
-We took advantage of the available tester files to test our implementation. We also used print statements to ensure that the threads were being scheduled in the expected order, that the final thread scheduled is the idle thread, etc.
+We took advantage of the available tester files to test our implementation. We
+also used print statements to ensure that the threads were being scheduled in
+the expected order, that the final thread scheduled is the idle thread, etc.
 
 ## Semaphore Implementation
 We understood from the instructions that when threads are running concurrently
@@ -112,7 +117,11 @@ semaphore's wait queue and dequeues it from the ready queue. This ensures the
 thread cannot be scheduled until the semaphore becomes available. Returns 0 for
 success and -1 for failure.
 <h5 a><strong><code>int sem_up(sem_t sem)</code></strong></h5>
-This function checks if sem is not NULL if true then it checks increases the count for the semaphore, then it checks if there are any threads in the wait queue and enqueues them to the ready queue. Since they are going to be using the resource we decrement the count again. Returns 0 for success and -1 for failure.
+This function checks if sem is not NULL if true then it checks increases the
+count for the semaphore, then it checks if there are any threads in the wait
+queue and enqueues them to the ready queue. Since they are going to be using the
+resource we decrement the count again. Returns 0 for success and -1 for failure.
+
 <h5 a><strong><code>void uthread_unblock(struct uthread_tcb *uthread)</code></strong></h5>
 This function makes sure we switch out from the current thread to the next
 thread in the ready queue. This ensures that we don't schedule the current
@@ -134,15 +143,17 @@ of available resources and prevents threads from overusing resources.
 ### Preemption Functions
 <h5 a><strong><code>void preempt_start(bool preempt)</code></strong></h5>
 
-If preempt is true then this function sets up the signal handler. It uses
-sigaction and setitimer to set up what to do when a signal is received and to
-set up a signal alarm of type SIGVTALRM that is sent at a frequency of 100Hz.
+This function checks if preempt is true then this function sets up the signal
+handler. It uses sigaction and setitimer to set up what to do when a signal is
+received and to set up a signal alarm of type SIGVTALRM that is sent at a
+frequency of 100Hz.
 <h5 a><strong><code>void preempt_stop(void)</code></strong></h5>
 
-
+This function checks if preempt is true then it restores the previous signal
+action and restores the previous timer configuration.
 <h5 a><strong><code>void preempt_disable(void)</code></strong></h5>
 
-
+This function blocks the SIGVTALRM signal using sigprocmask and 
 <h5 a><strong><code>void preempt_enable(void)</code></strong></h5>
 
 ### Preemption Testing
