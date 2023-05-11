@@ -72,7 +72,8 @@ void test_queue_queue(void){
 void test_delete(void){
 	int *ptr;
 	int arr[] = {4,5,6,5,4};
-	fprintf(stderr, "\n*** TEST delete***\n");
+	fprintf(stderr, "\n*** TEST delete ***\n");
+
 	queue_t q = queue_create();
 	for (int i = 0; i < 5; i++) {
 		queue_enqueue(q, &arr[i]);
@@ -89,12 +90,81 @@ void test_delete(void){
 	queue_dequeue(q, (void**)&ptr);
 	queue_dequeue(q, (void**)&ptr);
 	TEST_ASSERT(ptr == &arr[4]);
+}
+
+/* Test Delete Delete: creates a queue and initializes it with values; deletes two different values */
+void test_delete_delete(void){
+	int *ptr;
+	int arr[] = {1, 2, 3, 4, 5};
+	fprintf(stderr, "\n*** TEST delete delete ***\n");
 	
+	queue_t q = queue_create();
+	for (int i = 0; i < 5; i++) {
+		queue_enqueue(q, &arr[i]);
+	}
+
+	queue_delete(q, &arr[1]); // looks for and deletes '2'
+	int len = queue_length(q);
+	fprintf(stderr,"queue length: %d\n",len);
+
+	queue_delete(q, &arr[2]); // looks for and deletes '3'
+	len = queue_length(q);
+	fprintf(stderr,"queue length: %d\n",len);
+
+	queue_dequeue(q, (void**)&ptr);
+	TEST_ASSERT(ptr == &arr[0]);
+	queue_dequeue(q, (void**)&ptr);
+	TEST_ASSERT(ptr == &arr[3]);
+	queue_dequeue(q, (void**)&ptr);
+	TEST_ASSERT(ptr == &arr[4]);
+}
+
+/* Test Delete Before: creates a queue and initializes it with values; deletes two different values, where the second value is earlier in the queue than the first value */
+void test_delete_before(void){
+	int *ptr;
+	int arr[] = {1, 2, 3, 4, 5};
+	fprintf(stderr, "\n*** TEST delete before ***\n");
+	
+	queue_t q = queue_create();
+	for (int i = 0; i < 5; i++) {
+		queue_enqueue(q, &arr[i]);
+	}
+
+	queue_delete(q, &arr[3]); // looks for and deletes '4'
+	int len = queue_length(q);
+	fprintf(stderr,"queue length: %d\n",len);
+
+	queue_delete(q, &arr[1]); // looks for and deletes '2'
+	len = queue_length(q);
+	fprintf(stderr,"queue length: %d\n",len);
+
+	queue_dequeue(q, (void**)&ptr);
+	TEST_ASSERT(ptr == &arr[0]);
+	queue_dequeue(q, (void**)&ptr);
+	TEST_ASSERT(ptr == &arr[2]);
+	queue_dequeue(q, (void**)&ptr);
+	TEST_ASSERT(ptr == &arr[4]);
+}
+
+/* Test Delete No Value: creates a queue and initializes it with values; tries to delete a value that is not in the queue */
+void test_delete_noval(void){
+	int arr[] = {1, 2, 3, 4, 5};
+	fprintf(stderr, "\n*** TEST delete no value ***\n");
+	
+	queue_t q = queue_create();
+	for (int i = 0; i < 5; i++) {
+		queue_enqueue(q, &arr[i]);
+	}
+
+	int num = 10;
+	queue_delete(q, &num); // looks for and tries to delete '10'
+	int len = queue_length(q);
+	TEST_ASSERT(len==5); // if length is still 5, 
 }
 
 /* Test Destroy: makes sure destroy() is only successful when queue is empty */
 void test_destroy(void){
-	fprintf(stderr, "\n*** TEST destroy***\n");
+	fprintf(stderr, "\n*** TEST destroy ***\n");
 	queue_t q = queue_create();
 	int data = 10, *ptr,retval;
 	queue_enqueue(q,&data);
@@ -118,7 +188,7 @@ static void iterator_inc(queue_t q, void *data)
 /* Test iterator: initialize the queue with values, then increment every value in the queue and perform a deletion */
 void test_iterator(void)
 {
-	fprintf(stderr, "\n*** TEST iterator***\n");
+	fprintf(stderr, "\n*** TEST iterator ***\n");
     queue_t q;
     int data[] = {1, 2, 3, 4, 5, 42, 6, 7, 8, 9};
     size_t i;
@@ -200,12 +270,32 @@ void test_destroy_nexist(void)
 	TEST_ASSERT(retval == -1);
 }
 
+/* Test Iterator Null Func: try to iterate with a null func name */
+void test_iterator_nullfunc(void)
+{
+	fprintf(stderr, "\n*** TEST iterator null func ***\n");
+    queue_t q;
+    int data[] = {1, 2, 3, 4, 5, 42, 6, 7, 8, 9};
+    size_t i;
+
+    /* Initialize the queue and enqueue items */
+    q = queue_create();
+    for (i = 0; i < sizeof(data) / sizeof(data[0]); i++)
+        queue_enqueue(q, &data[i]);
+
+    int retval = queue_iterate(q, NULL); // iterate should return unsuccessful
+    TEST_ASSERT(retval == -1);
+}
+
 int main(void)
 {
 	test_create();
 	test_queue_simple();
 	test_queue_queue();
 	test_delete();
+	test_delete_delete();
+	test_delete_before();
+	test_delete_noval();
 	test_destroy();
 	test_iterator();
 	test_enqueue_nullval();
@@ -213,6 +303,7 @@ int main(void)
 	test_dequeue_empty();
 	test_delete_empty();
 	test_destroy_nexist();
+	test_iterator_nullfunc();
 
 	return 0;
 }
