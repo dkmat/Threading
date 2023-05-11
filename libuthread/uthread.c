@@ -31,24 +31,28 @@ struct uthread_tcb *uthread_current(void)
 
 void uthread_yield(void)
 {
+	preempt_disable();
 	struct uthread_tcb* next;
 	struct uthread_tcb* swap = current;
 	queue_dequeue(ready_queue,(void**)&next); // dequeue next ready process
 	queue_enqueue(ready_queue,current);// enqueue current process
 	current = next;
+	preempt_enable();
 	uthread_ctx_switch(swap->context,next->context); // context switch from current -> next
-	
 }
 
 void uthread_exit(void)
 {
+	preempt_disable();
 	struct uthread_tcb* next;
 	queue_dequeue(ready_queue,(void**)&next); // dequeue next ready process ()
+	preempt_enable();
 	uthread_ctx_switch(current->context,next->context);// context switch from current -> next
 }
 
 int uthread_create(uthread_func_t func, void *arg)
 {
+	preempt_disable();
 	struct uthread_tcb *thread = malloc(sizeof(struct uthread_tcb));
 	if(thread==NULL)
 		return -1;
@@ -60,6 +64,7 @@ int uthread_create(uthread_func_t func, void *arg)
 	if(retval==-1) 
 		return -1;
 	queue_enqueue(ready_queue,thread);
+	preempt_enable();
 	return 0;
 }
 
@@ -69,15 +74,17 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	struct uthread_tcb *idle = malloc(sizeof(struct uthread_tcb));
 	idle->context = malloc(sizeof(uthread_ctx_t));
 	idle->threadStack = uthread_ctx_alloc_stack();
-	if(!preempt){
-		uthread_create(func,arg);
-		while(queue_length(ready_queue)!=0){// while other threads are ready and waiting
-			current = idle;
-			uthread_yield();
-		}
-		fprintf(stderr,"back in main\n");
-		queue_destroy(ready_queue);
+	preempt_start(preempt);
+	uthread_create(func,arg);
+	while(queue_length(ready_queue)!=0){// while other threads are ready and waiting
+		current = idle;
+		uthread_yield();
 	}
+
+	fprintf(stderr,"back in main\n");
+	queue_destroy(ready_queue);
+	if(preempt)
+		preempt_stop();
 	return 0;
 }
 

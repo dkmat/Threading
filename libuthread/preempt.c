@@ -20,16 +20,20 @@ void sig_handler(int signum){
 	(void)signum;
 	uthread_yield();
 }
-
+sigset_t signal_set;
 
 void preempt_disable(void)
 {
-	
+	sigemptyset(&signal_set);
+	sigaddset(&signal_set,SIGVTALRM);
+	sigprocmask(SIG_BLOCK, &signal_set, NULL);
 }
 
 void preempt_enable(void)
 {
-	
+	sigemptyset(&signal_set);
+	sigaddset(&signal_set,SIGVTALRM);
+	sigprocmask(SIG_UNBLOCK, &signal_set, NULL);
 }
 
 void preempt_start(bool preempt)
