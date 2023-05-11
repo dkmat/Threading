@@ -65,10 +65,12 @@ This function leaves the current thread and never returns to it that is why it
 is called exit. This function is called when the thread is done executing and is
 ready to become a zombie thread and be collected by the parent process.
 <h5 a><strong><code>int uthread_create(uthread_func_t func, void *arg)</code></strong></h5>
+
 This function creates a TCB (uthread_tcb struct) for a new thread. It does this
-by allocating memory for the uthread_tcb struct, the stack (via uthread_ctx_alloc_stack()), and the context, and
-initializing the context with the provided function and arg (via uthread_ctx_init()). It then enqueues
-this to the ready queue. 
+by allocating memory for the uthread_tcb struct, the stack (via
+uthread_ctx_alloc_stack()), and the context, and initializing the context with
+the provided function and arg (via uthread_ctx_init()). It then enqueues this to
+the ready queue. 
 <h5 a><strong><code>int uthread_run(void)</code></strong></h5>
 This function acts as the main thread, this is always going to be the parent
 thread. This function creates the other threads and executes them. This function
@@ -84,18 +86,34 @@ control resources and if two different threads try to access the same resource
 one of them is put in the queue while the other uses the resource. The other one
 can use the resource later when it becomes available.
 ### Semaphore Struct
-To keep track of each semaphore's resource and its availability, we use a semaphore struct, which contains the semaphore count (can be 0 or a positive integer) and a wait queue, to keep track of the threads that are waiting to use the resource. 
+To keep track of each semaphore's resource and its availability, we use a
+semaphore struct, which contains the semaphore count (can be 0 or a positive
+integer) and a wait queue, to keep track of the threads that are waiting to use
+the resource.
 
 ### Semaphore Functions
 <h5 a><strong><code>sem_t sem_create(size_t count)</code></strong></h5>
-
-
+This function allocates memory for the semaphore and check if memory allocation
+was successful. Set the internal count to the parameter count and allocates the
+wait queue for the semaphore as well. Returns the created semaphore struct.
+Returns -1 for failure.
 <h5 a><strong><code>int sem_destroy(sem_t sem)</code></strong></h5>
-
+This function checks if sem is not NULL and if the wait queue is empty if true
+it deallocates the sem semaphore. Returns 0 for succes and -1 for failure. 
 <h5 a><strong><code>int sem_down(sem_t sem)</code></strong></h5>
-
+This function checks if sem is not NULL if true then it checks if semaphore is
+available by checking the count. If it is available then it decrements it
+because it is being used. Otherwise, it adds the current thread to the
+semaphore's wait queue and dequeues it from the ready queue. This ensures the
+thread cannot be scheduled until the semaphore becomes available. Returns 0 for
+success and -1 for failure.
 <h5 a><strong><code>int sem_up(sem_t sem)</code></strong></h5>
-
-<h5 a><strong><code>void uthread_block(void)</code></strong></h5>
-
+This function checks if sem is not NULL if true then it checks increases the count for the semaphore, then it checks if there are any threads in the wait queue and enqueues them to the ready queue. Since they are going to be using the resource we decrement the count again. Returns 0 for success and -1 for failure.
+<h5 a><strong><code>void uthread_unblock(struct uthread_tcb *uthread)</code></strong></h5>
+This function makes sure we switch out from the current thread to the next
+thread in the ready queue. This ensures that we don't schedule the current
+thread until it enters the ready queue again.
 <h5 a><strong><code>void uthread_unblock(void)</code></strong></h5>
+This function enqueues the thread freed from the wait queue into the ready
+queue. This makes the uthread parameter ready and it can be scheduled in the
+future.
