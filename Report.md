@@ -157,6 +157,10 @@ This function blocks the SIGVTALRM signal using sigprocmask. This allows us to
 section off parts of code that we need to avoid interrupting.
 <h5 a><strong><code>void preempt_enable(void)</code></strong></h5>
 
-This function
+This function unblocks the SIGVTALRM signal using sigprocmask. This allows us to
+resume interruptions for parts of code that can be interrupted.
 ### Preemption Testing
-
+We created a test in test_preempt.c file that runs indefinitely switching
+between threads using the preemptive interrupts. It switches from the main
+thread to thread1, thread2, thread3 then back to main using the preemptive
+interrupts.
