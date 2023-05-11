@@ -77,7 +77,7 @@ thread. This function creates the other threads and executes them. This function
 keeps running the threads until there are threads in the ready_queue. Once all
 the threads are done executing and exit then this function returns 0 to exit.
 
-# Semaphore Implementation
+## Semaphore Implementation
 We understood from the instructions that when threads are running concurrently
 and using the same resources then they could potentially change the same
 resource and cause problems if we don't add proper measures for synchronization.
@@ -118,10 +118,22 @@ This function enqueues the thread freed from the wait queue into the ready
 queue. This makes the uthread parameter ready and it can be scheduled in the
 future.
 
-# Preemption Implementation
+## Preemption Implementation
 For our implementation we use preemption so that the user does not have to call
 the uthread_yield() function to switch threads. With preemption a thread cannot
 have CPU resources indefinitely this allows a thread to be yielded between its
 execution and then return to continue its execution. This allows for fair usage
 of available resources and prevents threads from overusing resources.
+### Preemption Functions
+<h5 a><strong><code>void preempt_start(bool preempt)</code></strong></h5>
 
+If preempt is true then this function sets up the signal handler. It uses
+sigaction and setitimer to set up what to do when a signal is received and to
+set up a signal alarm of type SIGVTALRM that is sent at a frequency of 100Hz.
+<h5 a><strong><code>void preempt_stop(void)</code></strong></h5>
+
+
+<h5 a><strong><code>void preempt_disable(void)</code></strong></h5>
+
+
+<h5 a><strong><code>void preempt_enable(void)</code></strong></h5>
