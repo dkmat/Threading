@@ -153,8 +153,10 @@ This function checks if preempt is true then it restores the previous signal
 action and restores the previous timer configuration.
 <h5 a><strong><code>void preempt_disable(void)</code></strong></h5>
 
-This function blocks the SIGVTALRM signal using sigprocmask and 
+This function blocks the SIGVTALRM signal using sigprocmask. This allows us to
+section off parts of code that we need to avoid interrupting.
 <h5 a><strong><code>void preempt_enable(void)</code></strong></h5>
 
+This function
 ### Preemption Testing
 
