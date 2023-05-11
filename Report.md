@@ -119,3 +119,9 @@ queue. This makes the uthread parameter ready and it can be scheduled in the
 future.
 
 # Preemption Implementation
+For our implementation we use preemption so that the user does not have to call
+the uthread_yield() function to switch threads. With preemption a thread cannot
+have CPU resources indefinitely this allows a thread to be yielded between its
+execution and then return to continue its execution. This allows for fair usage
+of available resources and prevents threads from overusing resources.
+
