@@ -80,10 +80,8 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	else{
 		while(1){
 			current = idle;
-			fprintf(stderr,"main thread\n");
 		}
 	}
-	fprintf(stderr,"back in main\n");
 	queue_destroy(ready_queue);
 	if(preempt)
 		preempt_stop();

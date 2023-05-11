@@ -45,6 +45,9 @@ element. Return 0 for success and -1 for failure.
 This function checks if queue is not NULL. Returns queue length for success and
 -1 for failure.
 
+### Queue Testing
+To test our implementation, we use several test cases (see queue_tester.c file) to catch corner cases (such as enqueuing/dequeueing from a queue that hasn't been created yet) and ensure correct operation (making sure that deleting a particular value works correctly).
+
 ## UThread Implementation
 We use a struct to hold information about each thread's stack and its context.
 We used the ucontext library functions to setup, execute and exit each thread.
@@ -65,7 +68,6 @@ This function leaves the current thread and never returns to it that is why it
 is called exit. This function is called when the thread is done executing and is
 ready to become a zombie thread and be collected by the parent process.
 <h5 a><strong><code>int uthread_create(uthread_func_t func, void *arg)</code></strong></h5>
-
 This function creates a TCB (uthread_tcb struct) for a new thread. It does this
 by allocating memory for the uthread_tcb struct, the stack (via
 uthread_ctx_alloc_stack()), and the context, and initializing the context with
@@ -76,6 +78,9 @@ This function acts as the main thread, this is always going to be the parent
 thread. This function creates the other threads and executes them. This function
 keeps running the threads until there are threads in the ready_queue. Once all
 the threads are done executing and exit then this function returns 0 to exit.
+
+### UThread Testing
+We took advantage of the available tester files to test our implementation. We also used print statements to ensure that the threads were being scheduled in the expected order, that the final thread scheduled is the idle thread, etc.
 
 ## Semaphore Implementation
 We understood from the instructions that when threads are running concurrently
@@ -90,7 +95,6 @@ To keep track of each semaphore's resource and its availability, we use a
 semaphore struct, which contains the semaphore count (can be 0 or a positive
 integer) and a wait queue, to keep track of the threads that are waiting to use
 the resource.
-
 ### Semaphore Functions
 <h5 a><strong><code>sem_t sem_create(size_t count)</code></strong></h5>
 This function allocates memory for the semaphore and check if memory allocation
@@ -118,6 +122,9 @@ This function enqueues the thread freed from the wait queue into the ready
 queue. This makes the uthread parameter ready and it can be scheduled in the
 future.
 
+### Semaphore Testing
+We took advantage of the available tester files to test our implementation.
+
 ## Preemption Implementation
 For our implementation we use preemption so that the user does not have to call
 the uthread_yield() function to switch threads. With preemption a thread cannot
@@ -137,3 +144,6 @@ set up a signal alarm of type SIGVTALRM that is sent at a frequency of 100Hz.
 
 
 <h5 a><strong><code>void preempt_enable(void)</code></strong></h5>
+
+### Preemption Testing
+
