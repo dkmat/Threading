@@ -117,3 +117,5 @@ thread until it enters the ready queue again.
 This function enqueues the thread freed from the wait queue into the ready
 queue. This makes the uthread parameter ready and it can be scheduled in the
 future.
+
+# Preemption Implementation
