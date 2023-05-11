@@ -5,11 +5,11 @@
 #include "sem.h"
 #include "private.h"
 
-struct semaphore {
+struct semaphore { //this struct is used to manage specific resources
 	int count;
 	queue_t wait_queue;
 };
-
+//initializes count amount of resources for semaphore and return the semaphore
 sem_t sem_create(size_t count)
 {
 	sem_t create = malloc(sizeof(sem_t));
@@ -20,7 +20,7 @@ sem_t sem_create(size_t count)
 	create->wait_queue = queue_create();
 	return create;
 }
-
+//deallocates the sem semaphore provided
 int sem_destroy(sem_t sem)
 {
 	if(sem==NULL || queue_length(sem->wait_queue)>0)
@@ -28,7 +28,7 @@ int sem_destroy(sem_t sem)
 	free(sem);
 	return 0;
 }
-
+//uses up the sem resource if not available then enqueues the current thread to wait queue
 int sem_down(sem_t sem)
 {
 	if(sem==NULL)
@@ -42,7 +42,7 @@ int sem_down(sem_t sem)
 	}
 	return 0;
 }
-
+//frees up the sem resource if a thread is waiting then it uses the freed resource 
 int sem_up(sem_t sem)
 {
 	if(sem==NULL)

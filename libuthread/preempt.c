@@ -45,7 +45,7 @@ void preempt_start(bool preempt)
 		sigaction(SIGVTALRM,&sig,&old_sig);
 		struct itimerval timer;
 		timer.it_interval.tv_sec = 0;
-		timer.it_interval.tv_usec = 10;
+		timer.it_interval.tv_usec = 1000/HZ;
 		timer.it_value = timer.it_interval;
 		setitimer(ITIMER_VIRTUAL,&timer,NULL);
 	}

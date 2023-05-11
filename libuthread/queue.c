@@ -4,19 +4,19 @@
 #include <stdio.h>
 #include "queue.h"
 
-struct node{
+struct node{ // this struct is to control each item of our queue
 	void* info;
 	struct node* next;
 };
 
-struct queue {
+struct queue { // this struct is to control our queue
 	struct node* head;
 	struct node* tail;
 	int length;
 };
 
 
-queue_t queue_create(void)
+queue_t queue_create(void) // allocating memory and initializing the queue
 {
 	queue_t start = malloc(sizeof(queue_t)); 
 	if(start==NULL)
@@ -25,15 +25,15 @@ queue_t queue_create(void)
 	return start;
 }
 
-int queue_destroy(queue_t queue)
+int queue_destroy(queue_t queue) //deallocating memory of the given queue
 {
 	if(queue==NULL||queue->length!=0)
 		return -1;
 	free(queue);
 	return 0;
 }
-
-int queue_enqueue(queue_t queue, void *data)
+// assigning data to an item and adding it to the given queue
+int queue_enqueue(queue_t queue, void *data) //items are added to the back of the queue
 {
 	if(queue == NULL||data == NULL)
 		return -1;
@@ -52,8 +52,8 @@ int queue_enqueue(queue_t queue, void *data)
 	queue->length++;
 	return 0;
 }
-
-int queue_dequeue(queue_t queue, void **data)
+//removing the item from the queue and assigning its info to data
+int queue_dequeue(queue_t queue, void **data)// the item we remove is the oldest in the queue
 {
 	if(queue == NULL||queue->length==0)
 		return -1;
@@ -66,8 +66,8 @@ int queue_dequeue(queue_t queue, void **data)
 	queue->length--;
 	return 0;
 }
-
-int queue_delete(queue_t queue, void *data)
+//removing the item from the queue that holds data 
+int queue_delete(queue_t queue, void *data)// the oldest item with data is removed
 {
 	if(queue==NULL || data==NULL || queue->length==0)
 		return -1;
@@ -96,7 +96,7 @@ int queue_delete(queue_t queue, void *data)
 	}
 	return -1; // if data not found
 }
-
+//goes through the whole queue and applies func to each item
 int queue_iterate(queue_t queue, queue_func_t func)
 {
 	if(queue==NULL || func==NULL)
@@ -111,7 +111,7 @@ int queue_iterate(queue_t queue, queue_func_t func)
 	return 0;
 }
 
-int queue_length(queue_t queue)
+int queue_length(queue_t queue)// gives the length of the given queue
 {
 	if(queue==NULL) {
 		return -1;

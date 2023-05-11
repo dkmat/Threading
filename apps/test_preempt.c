@@ -3,8 +3,15 @@
 #include <stdlib.h>
 
 #include <uthread.h>
+void thread3(void*arg){
+    (void)arg;
+    while(1){
+        printf("thread3\n");
+    }
+}
 void thread2(void *arg){
     (void)arg;
+    uthread_create(thread3,NULL);
     while(1){
         printf("thread2\n");
     }
