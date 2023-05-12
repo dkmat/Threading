@@ -16,8 +16,9 @@
 #define BLOCKED 3
 #define UNUSED(x) (void)(x)
 
-queue_t ready_queue;
+queue_t ready_queue; // queue of threads that are ready to be scheduled
 
+// This struct acts as a TCB, keeping track of the thread's stack pointer and context
 struct uthread_tcb {
 	void* threadStack;
 	uthread_ctx_t* context;
@@ -29,23 +30,26 @@ struct uthread_tcb *uthread_current(void)
 	return current;
 }
 
+// Yield to next thread in the ready queue
 void uthread_yield(void)
 {
 	struct uthread_tcb* next;
 	struct uthread_tcb* swap = current;
-	queue_dequeue(ready_queue,(void**)&next); // dequeue next ready process
-	queue_enqueue(ready_queue,current);// enqueue current process
+	queue_dequeue(ready_queue,(void**)&next);	// dequeue next ready thread
+	queue_enqueue(ready_queue,current);			// enqueue current thread
 	current = next;
 	uthread_ctx_switch(swap->context,next->context); // context switch from current -> next
 }
 
+// Exit from currently running thread
 void uthread_exit(void)
 {
 	struct uthread_tcb* next;
-	queue_dequeue(ready_queue,(void**)&next); // dequeue next ready process ()
-	uthread_ctx_switch(current->context,next->context);// context switch from current -> next
+	queue_dequeue(ready_queue,(void**)&next); // dequeue next ready thread
+	uthread_ctx_switch(current->context,next->context); // context switch from current -> next
 }
 
+// Create and initialize a thread and enqueue it to the ready queue
 int uthread_create(uthread_func_t func, void *arg)
 {
 	struct uthread_tcb *thread = malloc(sizeof(struct uthread_tcb));
@@ -54,25 +58,28 @@ int uthread_create(uthread_func_t func, void *arg)
 	thread->threadStack = uthread_ctx_alloc_stack(); // allocate stack
 	if(thread->threadStack==NULL)
 		return -1;
-	thread->context = malloc(sizeof(ucontext_t));
+	thread->context = malloc(sizeof(ucontext_t)); // allocate context
 	int retval = uthread_ctx_init(thread->context, thread->threadStack, func, arg); // initialize context
 	if(retval==-1) 
 		return -1;
-	queue_enqueue(ready_queue,thread);
+	queue_enqueue(ready_queue,thread); // enqueue the created thread to the ready queue
 
 	return 0;
 }
 
+// Start the multithreading scheduling library; idle until there are no other threads to be scheduled, return when all threads have finished executing
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
-	ready_queue = queue_create();
+	ready_queue = queue_create(); // create the ready queue
+	// Set up 'idle' thread
 	struct uthread_tcb *idle = malloc(sizeof(struct uthread_tcb));
 	idle->context = malloc(sizeof(uthread_ctx_t));
 	idle->threadStack = uthread_ctx_alloc_stack();
+	
 	preempt_start(preempt);
 	uthread_create(func,arg);
 	if(!preempt){
-		while(queue_length(ready_queue)!=0){// while other threads are ready and waiting
+		while(queue_length(ready_queue)!=0){ // while other threads are ready and waiting
 			current = idle;
 			uthread_yield();
 		}
@@ -88,6 +95,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	return 0;
 }
 
+// Context switch from the current thread to the next thread in the ready queue
 void uthread_block(void)
 {
 	struct uthread_tcb* next;
@@ -97,6 +105,7 @@ void uthread_block(void)
 	uthread_ctx_switch(swap->context,next->context);
 }
 
+// Enqueue the provided thread to the ready queue
 void uthread_unblock(struct uthread_tcb *uthread)
 {
 	queue_enqueue(ready_queue,uthread);
