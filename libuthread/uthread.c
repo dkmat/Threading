@@ -33,19 +33,23 @@ struct uthread_tcb *uthread_current(void)
 // Yield to next thread in the ready queue
 void uthread_yield(void)
 {
+	preempt_disable();
 	struct uthread_tcb* next;
 	struct uthread_tcb* swap = current;
 	queue_dequeue(ready_queue,(void**)&next);	// dequeue next ready thread
 	queue_enqueue(ready_queue,current);			// enqueue current thread
 	current = next;
+	preempt_enable();
 	uthread_ctx_switch(swap->context,next->context); // context switch from current -> next
 }
 
 // Exit from currently running thread
 void uthread_exit(void)
 {
+	preempt_disable();
 	struct uthread_tcb* next;
 	queue_dequeue(ready_queue,(void**)&next); // dequeue next ready thread
+	preempt_enable();
 	uthread_ctx_switch(current->context,next->context); // context switch from current -> next
 }
 
@@ -63,7 +67,6 @@ int uthread_create(uthread_func_t func, void *arg)
 	if(retval==-1) 
 		return -1;
 	queue_enqueue(ready_queue,thread); // enqueue the created thread to the ready queue
-
 	return 0;
 }
 
